@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(node -e \"const p = require\\(''/Users/anshumgupta/Desktop/GST/server/node_modules/pdf-parse''\\); console.log\\(typeof p, typeof p.default, Object.keys\\(p\\)\\)\")",
+      "Bash(node -e \"const { PDFParse } = require\\(''/Users/anshumgupta/Desktop/GST/server/node_modules/pdf-parse''\\); const p = new PDFParse\\(\\); console.log\\(typeof p.pdf, Object.keys\\(Object.getPrototypeOf\\(p\\)\\)\\)\")",
+      "Bash(node -e \"const p = require\\(''/Users/anshumgupta/Desktop/GST/server/node_modules/pdf-parse''\\); console.log\\(typeof p\\)\")",
+      "Bash(node -e \":*)",
+      "Bash(node -e \"const p = require\\(''/Users/anshumgupta/Desktop/GST/server/node_modules/postmark''\\); console.log\\(typeof p.ServerClient\\)\")",
+      "Bash(npm uninstall:*)"
+    ]
+  }
+}
