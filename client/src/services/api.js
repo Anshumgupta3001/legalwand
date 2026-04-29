@@ -1,9 +1,17 @@
 import axios from 'axios';
+import { API_ORIGIN } from '../utils/apiConfig';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-
+/*
+ * axios instance — baseURL is the bare origin (e.g. 'http://localhost:5000' in
+ * dev, '' in production).  Every route path already includes the /api prefix,
+ * so the full request URL becomes: origin + '/api/route'.
+ *
+ * Do NOT set VITE_API_URL in .env for normal local dev — the runtime detection
+ * in apiConfig.js handles it automatically.  Set it only when you need to
+ * point a local build at a remote backend (e.g. staging).
+ */
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: API_ORIGIN,
   headers: {
     'Content-Type': 'application/json',
   },
