@@ -19,10 +19,8 @@ const inputStyle = {
 };
 
 const formTabs = [
-  { label: 'Sign In', path: '/'               },
-  { label: 'Sign Up', path: '/signup'         },
-  { label: 'Reset',   path: '/forgot-password'},
-  { label: 'OTP',     path: '/verify-otp'    },
+  { label: 'Sign In', path: '/'      },
+  { label: 'Sign Up', path: '/signup'},
 ];
 
 const SignUp = () => {

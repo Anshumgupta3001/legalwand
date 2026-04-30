@@ -11,13 +11,8 @@ const sanitizeUser = (user) => ({
   firstName: user.firstName,
   lastName: user.lastName,
   email: user.email,
-  mobile: user.mobile || null,
-  gstin: user.gstin || null,
-  companyName: user.companyName || null,
-  businessType: user.businessType || null,
   credits: user.credits || 0,
   pro_user: user.pro_user || false,
-  isVerified: user.isVerified || false,
   createdAt: user.createdAt,
   updatedAt: user.updatedAt,
 });
@@ -113,110 +108,8 @@ const getMe = async (req, res) => {
   });
 };
 
-const forgotPassword = async (req, res) => {
-  try {
-    const { email } = req.body;
-
-    if (!email) {
-      return res.status(400).json({
-        success: false,
-        message: 'Please provide an email address.',
-      });
-    }
-
-    const normalizedEmail = email.toLowerCase().trim();
-    const user = await User.findOne({ email: normalizedEmail });
-
-    if (!user) {
-      return res.status(200).json({
-        success: true,
-        message: 'If that email is registered, a verification code has been generated.',
-      });
-    }
-
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const otpExpiry = new Date(Date.now() + 15 * 60 * 1000);
-
-    user.otp = otp;
-    user.otpExpiry = otpExpiry;
-    await user.save({ validateBeforeSave: false });
-
-    const response = {
-      success: true,
-      message: 'Verification code generated. Use it to reset your password.',
-    };
-
-    if (process.env.NODE_ENV !== 'production') {
-      response.otp = otp;
-    }
-
-    return res.status(200).json(response);
-  } catch (error) {
-    console.error('Forgot password error:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Unable to process password reset. Please try again later.',
-    });
-  }
-};
-
-const verifyOtp = async (req, res) => {
-  try {
-    const { email, otp, newPassword } = req.body;
-
-    if (!email || !otp || !newPassword) {
-      return res.status(400).json({
-        success: false,
-        message: 'Please provide email, code, and new password.',
-      });
-    }
-
-    const normalizedEmail = email.toLowerCase().trim();
-    const user = await User.findOne({ email: normalizedEmail }).select('+otp +otpExpiry +password');
-
-    if (!user || !user.otp || !user.otpExpiry) {
-      return res.status(400).json({
-        success: false,
-        message: 'No valid reset request found for this email.',
-      });
-    }
-
-    if (user.otp !== otp) {
-      return res.status(400).json({
-        success: false,
-        message: 'The verification code is incorrect.',
-      });
-    }
-
-    if (user.otpExpiry < new Date()) {
-      return res.status(400).json({
-        success: false,
-        message: 'The verification code has expired.',
-      });
-    }
-
-    user.password = newPassword;
-    user.otp = undefined;
-    user.otpExpiry = undefined;
-    await user.save();
-
-    return res.status(200).json({
-      success: true,
-      message: 'Password has been reset successfully.',
-    });
-  } catch (error) {
-    console.error('OTP verify error:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Unable to verify code. Please try again later.',
-    });
-  }
-};
-
 module.exports = {
   register,
   login,
   getMe,
-  forgotPassword,
-  verifyOtp,
 };

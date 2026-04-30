@@ -75,6 +75,7 @@ export const AuthProvider = ({ children }) => {
       const { token: accessToken, user: userData } = response.data;
       setToken(accessToken);
       setUser(userData);
+      setIsAuthenticated(true);
       return response.data;
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed');
@@ -93,39 +94,10 @@ export const AuthProvider = ({ children }) => {
       const { token: accessToken, user: userData } = response.data;
       setToken(accessToken);
       setUser(userData);
+      setIsAuthenticated(true);  /* was missing — RequireAuth checked this */
       return response.data;
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const forgotPassword = async (data) => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const response = await authAPI.forgotPassword(data);
-      return response.data;
-    } catch (err) {
-      setError(err.response?.data?.message || 'Request failed');
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const verifyOTP = async (data) => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const response = await authAPI.verifyOTP(data);
-      return response.data;
-    } catch (err) {
-      setError(err.response?.data?.message || 'OTP verification failed');
       throw err;
     } finally {
       setLoading(false);
@@ -147,8 +119,6 @@ export const AuthProvider = ({ children }) => {
       register,
       login,
       logout,
-      forgotPassword,
-      verifyOTP,
       setError,
       updateUser,
     }),

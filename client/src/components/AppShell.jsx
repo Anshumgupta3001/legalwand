@@ -1,53 +1,168 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const SIDEBAR_W = 260;
 
+/*
+ * NAV config — add disabled: true to any item you want to grey out.
+ * Routes and backend are NOT affected; this is purely a UI restriction.
+ * The item remains visible so users understand the feature exists.
+ */
 const NAV = [
   {
     section: 'Overview',
     items: [
-      { label: 'Dashboard',      icon: '📊', path: '/home'            },
+      { label: 'Dashboard',        icon: '📊', path: '/home'            },
     ],
   },
   {
     section: 'AI',
     items: [
-      { label: 'AI Chat',         icon: '💬', path: '/dashboard'          },
-      { label: 'AI Chat (Updated)',icon: '⚖️', path: '/ai-chat-updated'   },
+      { label: 'AI Chat',          icon: '💬', path: '/dashboard',       disabled: true  },
+      { label: 'AI Chat (Updated)',icon: '⚖️', path: '/ai-chat-updated', disabled: false },
+      { label: 'Library',          icon: '📂', path: '/library'                          },
+      { label: 'Explorer',         icon: '🔍', path: '/explorer'                         },
     ],
   },
   {
     section: 'Clients',
     items: [
-      { label: 'All Clients',    icon: '👥', path: '/clients'         },
-      { label: 'New Client',     icon: '➕', path: '/clients/new'     },
+      { label: 'All Clients',      icon: '👥', path: '/clients',     disabled: true },
+      { label: 'New Client',       icon: '➕', path: '/clients/new', disabled: true },
     ],
   },
   {
     section: 'Data',
     items: [
-      { label: 'Data Management', icon: '🗂️', path: '/data-management' },
-      { label: 'Upload',          icon: '📤', path: '/upload'          },
-      { label: 'Overview',        icon: '📈', path: '/overview'        },
-    ],
-  },
-  {
-    section: 'GST Documents',
-    items: [
-      { label: 'Library',        icon: '📂', path: '/library'         },
-      { label: 'Explorer',       icon: '🔍', path: '/explorer'        },
+      { label: 'Data Management',  icon: '🗂️', path: '/data-management',  disabled: true  },
+      { label: 'Upload',           icon: '📤', path: '/upload',           disabled: true  },
+      { label: 'Overview',         icon: '📈', path: '/overview',         disabled: false },
     ],
   },
   {
     section: 'Other',
     items: [
-      { label: 'News Feed',      icon: '📰', path: '/news'            },
-      { label: 'Features',       icon: '✨', path: '/features'        },
+      { label: 'News Feed',        icon: '📰', path: '/news'             },
+      { label: 'Features',         icon: '✨', path: '/features'         },
     ],
   },
 ];
+
+/* ── Shared item layout styles ── */
+const ITEM_BASE = {
+  display: 'flex',
+  alignItems: 'center',
+  gap: '9px',
+  padding: '8px 10px',
+  borderRadius: '8px',
+  fontSize: '13.5px',
+  fontWeight: 500,
+  textDecoration: 'none',
+  transition: 'background 0.15s, color 0.15s',
+  margin: '1px 0',
+  position: 'relative',
+};
+
+/*
+ * NavItem — renders an active NavLink for enabled items, a non-interactive
+ * div for disabled ones.  Disabled items:
+ *   • Cannot be clicked or keyboard-navigated (tabIndex -1, no href)
+ *   • Show reduced opacity + not-allowed cursor
+ *   • Show a tooltip on hover ("Disabled")
+ *   • Display a small inline badge so the state is obvious without hover
+ */
+const NavItem = ({ label, icon, path, disabled }) => {
+  const [hovered, setHovered] = useState(false);
+
+  const iconSpan = (
+    <span style={{ fontSize: '15px', width: '22px', textAlign: 'center', flexShrink: 0, lineHeight: 1 }}>
+      {icon}
+    </span>
+  );
+
+  /* ── Disabled: non-interactive div ── */
+  if (disabled) {
+    return (
+      <div
+        role="menuitem"
+        aria-disabled="true"
+        title="This feature is currently disabled"
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        style={{
+          ...ITEM_BASE,
+          opacity: 0.62,
+          cursor: 'not-allowed',
+          color: 'rgba(255,255,255,0.7)',
+          userSelect: 'none',
+          background: 'rgba(255,255,255,0.03)',
+        }}
+      >
+        {iconSpan}
+
+        <span style={{ flex: 1 }}>{label}</span>
+
+        {/* Inline badge — always visible, no hover required */}
+        <span style={{
+          fontSize: '9px',
+          fontWeight: 700,
+          letterSpacing: '.05em',
+          textTransform: 'uppercase',
+          padding: '2px 6px',
+          borderRadius: '99px',
+          background: 'rgba(255,255,255,0.08)',
+          color: 'rgba(255,255,255,0.35)',
+          border: '1px solid rgba(255,255,255,0.1)',
+          flexShrink: 0,
+        }}>
+          off
+        </span>
+
+        {/* Hover tooltip */}
+        {hovered && (
+          <div style={{
+            position: 'absolute',
+            left: 'calc(100% + 10px)',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            background: '#1e293b',
+            color: 'rgba(255,255,255,0.85)',
+            fontSize: '11.5px',
+            fontWeight: 500,
+            padding: '5px 10px',
+            borderRadius: '7px',
+            whiteSpace: 'nowrap',
+            border: '1px solid rgba(255,255,255,0.1)',
+            boxShadow: '0 4px 14px rgba(0,0,0,0.35)',
+            zIndex: 200,
+            pointerEvents: 'none',
+          }}>
+            This feature is disabled
+            {/* Arrow */}
+            <span style={{
+              position: 'absolute',
+              right: '100%', top: '50%', transform: 'translateY(-50%)',
+              border: '5px solid transparent',
+              borderRightColor: '#1e293b',
+            }} />
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  /* ── Enabled: standard NavLink ── */
+  return (
+    <NavLink
+      to={path}
+      className="shell-nav-item"
+    >
+      {iconSpan}
+      {label}
+    </NavLink>
+  );
+};
 
 const AppShell = ({ children }) => {
   const { user, logout } = useAuth();
@@ -113,39 +228,60 @@ const AppShell = ({ children }) => {
 
         {/* Nav */}
         <nav style={{ padding: '8px 10px', flex: 1, overflowY: 'auto' }}>
-          {NAV.map(({ section, items }) => (
-            <div key={section}>
-              <div style={{
-                fontSize: '10.5px',
-                fontWeight: 700,
-                color: 'rgba(255,255,255,0.3)',
-                letterSpacing: '.12em',
-                textTransform: 'uppercase',
-                padding: '0 10px',
-                margin: '20px 0 6px',
-              }}>
-                {section}
+          {/* ── Active sections — enabled items only ── */}
+          {NAV.map(({ section, items }) => {
+            const enabled = items.filter(i => !i.disabled);
+            if (enabled.length === 0) return null;
+            return (
+              <div key={section}>
+                <div style={{
+                  fontSize: '10.5px',
+                  fontWeight: 700,
+                  color: 'rgba(255,255,255,0.3)',
+                  letterSpacing: '.12em',
+                  textTransform: 'uppercase',
+                  padding: '0 10px',
+                  margin: '20px 0 6px',
+                }}>
+                  {section}
+                </div>
+                {enabled.map(({ label, icon, path }) => (
+                  <NavItem key={label} label={label} icon={icon} path={path} />
+                ))}
               </div>
-              {items.map(({ label, icon, path }) => (
-                <NavLink
-                  key={label}
-                  to={path}
-                  className="shell-nav-item"
-                >
-                  <span style={{
-                    fontSize: '15px',
-                    width: '22px',
-                    textAlign: 'center',
-                    flexShrink: 0,
-                    lineHeight: 1,
-                  }}>
-                    {icon}
-                  </span>
-                  {label}
-                </NavLink>
-              ))}
-            </div>
-          ))}
+            );
+          })}
+
+          {/* ── Coming Soon — all disabled items collected globally ── */}
+          {(() => {
+            const allDisabled = NAV.flatMap(({ items }) =>
+              items.filter(i => i.disabled)
+            );
+            if (allDisabled.length === 0) return null;
+            return (
+              <div>
+                <div style={{
+                  height: '1px',
+                  background: 'rgba(255,255,255,0.08)',
+                  margin: '16px 10px 0',
+                }} />
+                <div style={{
+                  fontSize: '10.5px',
+                  fontWeight: 700,
+                  color: 'rgba(255,255,255,0.22)',
+                  letterSpacing: '.12em',
+                  textTransform: 'uppercase',
+                  padding: '0 10px',
+                  margin: '14px 0 6px',
+                }}>
+                  Coming Soon
+                </div>
+                {allDisabled.map(({ label, icon, path }) => (
+                  <NavItem key={label} label={label} icon={icon} path={path} disabled />
+                ))}
+              </div>
+            );
+          })()}
         </nav>
 
         {/* User + sign out */}

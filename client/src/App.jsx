@@ -7,8 +7,6 @@ import Navbar from './components/Navbar';
 import AppShell from './components/AppShell';
 import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
-import ForgotPassword from './pages/ForgotPassword';
-import OTPVerify from './pages/OTPVerify';
 import Dashboard from './pages/Dashboard';
 import DashboardPage from './pages/DashboardPage';
 import AllClientsPage from './pages/AllClientsPage';
@@ -61,7 +59,7 @@ const RequireAuth = ({ children }) => {
 const RedirectIfAuthenticated = ({ children }) => {
   const { isAuthenticated, initialLoading } = useAuth();
   if (initialLoading) return null;
-  return isAuthenticated ? <Navigate to="/dashboard" replace /> : children;
+  return isAuthenticated ? <Navigate to="/home" replace /> : children;
 };
 
 const Shell = ({ children }) => (
@@ -77,11 +75,9 @@ const App = () => {
 
           <Routes>
             {/* ── Public / auth ── */}
-            <Route path="/"                element={<AuthLayout><RedirectIfAuthenticated><SignIn /></RedirectIfAuthenticated></AuthLayout>} />
-            <Route path="/signup"          element={<AuthLayout><RedirectIfAuthenticated><SignUp /></RedirectIfAuthenticated></AuthLayout>} />
-            <Route path="/forgot-password" element={<AuthLayout><ForgotPassword /></AuthLayout>} />
-            <Route path="/verify-otp"      element={<AuthLayout><OTPVerify /></AuthLayout>} />
-            <Route path="/terms"           element={<Terms />} />
+            <Route path="/"       element={<AuthLayout><RedirectIfAuthenticated><SignIn /></RedirectIfAuthenticated></AuthLayout>} />
+            <Route path="/signup" element={<AuthLayout><RedirectIfAuthenticated><SignUp /></RedirectIfAuthenticated></AuthLayout>} />
+            <Route path="/terms"  element={<Terms />} />
 
             {/* ── Core app pages ── */}
             <Route path="/home"            element={<Shell><DashboardPage /></Shell>} />

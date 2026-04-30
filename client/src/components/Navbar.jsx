@@ -14,10 +14,8 @@ const Navbar = () => {
         { label: 'Upload',     path: '/upload'    },
       ]
     : [
-        { label: 'Sign In',         path: '/'               },
-        { label: 'Register',        path: '/signup'         },
-        { label: 'Reset Password',  path: '/forgot-password'},
-        { label: 'Verify OTP',      path: '/verify-otp'    },
+        { label: 'Sign In',  path: '/'      },
+        { label: 'Sign Up',  path: '/signup'},
       ];
 
   const handleLogout = () => {
